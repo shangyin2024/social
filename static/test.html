@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社交媒体平台测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+
+        .section h3 {
+            color: #495057;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+            transform: translateY(-2px);
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .btn-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-card h4 {
+            color: #495057;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .btn-card p {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .btn-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>社交媒体平台测试</h1>
+            <p>简化的测试流程</p>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h3>🚀 快速开始</h3>
+                <div class="status info">
+                    <strong>测试流程：</strong> 授权 → 回调 → 分享
+                </div>
+                <p>按照以下步骤完成完整的OAuth测试流程：</p>
+                <ol style="margin: 15px 0; padding-left: 20px;">
+                    <li>点击"平台授权"开始OAuth授权流程</li>
+                    <li>完成授权后会自动跳转到回调处理页面</li>
+                    <li>回调成功后，点击"内容分享"测试分享功能</li>
+                </ol>
+            </div>
+
+            <div class="section">
+                <h3>📋 功能测试</h3>
+                <div class="btn-grid">
+                    <div class="btn-card">
+                        <h4>🔐 平台授权</h4>
+                        <p>选择平台并完成OAuth授权</p>
+                        <a href="auth.html" class="btn btn-primary">开始授权</a>
+                    </div>
+
+                    <div class="btn-card">
+                        <h4>🔄 回调处理</h4>
+                        <p>处理OAuth授权回调</p>
+                        <a href="callback.html" class="btn btn-success">处理回调</a>
+                    </div>
+
+                    <div class="btn-card">
+                        <h4>📤 内容分享</h4>
+                        <p>分享内容到各个平台</p>
+                        <a href="share.html" class="btn btn-info">开始分享</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🔧 配置说明</h3>
+                <div class="status info">
+                    <strong>重定向URI配置：</strong><br>
+                    在OAuth应用配置中设置回调URL为：<br>
+                    <code id="callback-url">动态获取中...</code>
+                </div>
+
+                <h4>支持的平台：</h4>
+                <ul style="margin: 15px 0; padding-left: 20px;">
+                    <li><strong>YouTube</strong> - 视频分享平台</li>
+                    <li><strong>X (Twitter)</strong> - 社交媒体平台</li>
+                    <li><strong>Facebook</strong> - 社交网络平台</li>
+                    <li><strong>TikTok</strong> - 短视频平台</li>
+                    <li><strong>Instagram</strong> - 图片分享平台</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h3>📊 测试状态</h3>
+                <div class="status info">
+                    <strong>当前状态：</strong> 准备开始测试<br>
+                    <strong>服务器：</strong> 运行中<br>
+                    <strong>API端点：</strong> <code>/auth/start</code>, <code>/auth/callback</code>,
+                    <code>/api/share</code>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载时的初始化
+        window.onload = function () {
+            console.log('社交媒体平台测试页面已加载');
+            console.log('可用的测试页面:');
+            console.log('1. auth.html - 平台授权');
+            console.log('2. callback.html - 回调处理');
+            console.log('3. share.html - 内容分享');
+
+            // 动态设置回调URL
+            const callbackUrl = `${window.location.origin}/static/callback.html`;
+            document.getElementById('callback-url').textContent = callbackUrl;
+        };
+    </script>
+</body>
+
+</html>

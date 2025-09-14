@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OAuth回调处理</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      font-weight: 300;
+    }
+
+    .header p {
+      opacity: 0.9;
+      font-size: 1.1em;
+    }
+
+    .content {
+      padding: 30px;
+    }
+
+    .section {
+      margin-bottom: 30px;
+      padding: 25px;
+      border: 1px solid #e9ecef;
+      border-radius: 10px;
+      background: #f8f9fa;
+    }
+
+    .section h3 {
+      color: #495057;
+      margin-bottom: 20px;
+      font-size: 1.3em;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #495057;
+    }
+
+    .input-group input,
+    .input-group textarea,
+    .input-group select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+
+    .input-group input:focus,
+    .input-group textarea:focus,
+    .input-group select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .input-group textarea {
+      height: 100px;
+      resize: vertical;
+    }
+
+    .btn {
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5a6fd8;
+      transform: translateY(-1px);
+    }
+
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #218838;
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 13px;
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .result.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .result.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .result.info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .status-indicator {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    .status-indicator.success {
+      background: #28a745;
+    }
+
+    .status-indicator.error {
+      background: #dc3545;
+    }
+
+    .status-indicator.warning {
+      background: #ffc107;
+    }
+
+    .status-indicator.info {
+      background: #17a2b8;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .callback-info {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+
+    .callback-info h4 {
+      color: #856404;
+      margin-bottom: 10px;
+    }
+
+    .callback-info p {
+      color: #856404;
+      margin: 5px 0;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        margin: 10px;
+        border-radius: 10px;
+      }
+
+      .header {
+        padding: 20px;
+      }
+
+      .header h1 {
+        font-size: 2em;
+      }
+
+      .content {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>OAuth回调处理</h1>
+      <p>处理OAuth授权回调</p>
+    </div>
+
+    <div class="content">
+      <div class="callback-info">
+        <h4>🔄 OAuth回调处理</h4>
+        <p>当您完成授权后，系统会自动处理回调。如果自动处理失败，您可以手动处理。</p>
+      </div>
+
+      <div class="section">
+        <h3>📋 回调参数</h3>
+        <div class="input-group">
+          <label for="callbackProvider">平台:</label>
+          <select id="callbackProvider">
+            <option value="">请选择平台...</option>
+            <option value="youtube">YouTube</option>
+            <option value="x">X (Twitter)</option>
+            <option value="facebook">Facebook</option>
+            <option value="tiktok">TikTok</option>
+            <option value="instagram">Instagram</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="callbackServerName">服务器名称:</label>
+          <input type="text" id="callbackServerName" placeholder="服务器名称">
+        </div>
+        <div class="input-group">
+          <label for="callbackCode">授权码:</label>
+          <input type="text" id="callbackCode" placeholder="从URL中获取的code参数">
+        </div>
+        <div class="input-group">
+          <label for="callbackState">状态参数:</label>
+          <textarea id="callbackState" placeholder="从URL中获取的state参数"></textarea>
+        </div>
+        <div class="input-group">
+          <label for="callbackRedirectUri">重定向URI:</label>
+          <input type="text" id="callbackRedirectUri" value="" placeholder="留空使用当前页面">
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>🎯 操作</h3>
+        <button class="btn btn-primary" onclick="handleCallback()">🔄 处理回调</button>
+        <button class="btn btn-success" onclick="autoDetectCallback()">🔍 自动检测</button>
+        <button class="btn btn-secondary" onclick="clearResults()">🗑️ 清空结果</button>
+      </div>
+
+      <div id="results" class="section hidden">
+        <h3>📊 回调结果</h3>
+        <div id="output"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = window.location.origin;
+
+    // 处理回调
+    async function handleCallback() {
+      const provider = document.getElementById('callbackProvider').value;
+      const serverName = document.getElementById('callbackServerName').value;
+      const code = document.getElementById('callbackCode').value;
+      const state = document.getElementById('callbackState').value;
+      let redirectUri = document.getElementById('callbackRedirectUri').value;
+
+      if (!provider || !serverName || !code || !state) {
+        alert('请填写所有必要参数');
+        return;
+      }
+
+      // 如果没有填写重定向URI，使用当前页面
+      if (!redirectUri) {
+        redirectUri = window.location.href;
+      }
+
+      try {
+        log('开始处理OAuth回调...', 'info');
+        log(`平台: ${provider}`, 'info');
+        log(`服务器: ${serverName}`, 'info');
+        log(`授权码: ${code}`, 'info');
+
+        const response = await fetch(`${API_BASE}/auth/callback`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            provider: provider,
+            server_name: serverName,
+            code: code,
+            state: state,
+            redirect_uri: redirectUri
+          })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          log('✅ OAuth回调处理成功！', 'success');
+          log(`完整响应: ${JSON.stringify(result, null, 2)}`, 'info');
+
+          // 显示时间戳信息
+          if (result.data) {
+            if (result.data.expires_at) {
+              const expiresDate = new Date(result.data.expires_at * 1000);
+              log(`Token过期时间: ${expiresDate.toLocaleString()}`, 'info');
+            }
+            if (result.data.refer_at) {
+              const referDate = new Date(result.data.refer_at * 1000);
+              log(`授权时间: ${referDate.toLocaleString()}`, 'info');
+            }
+          }
+        } else {
+          log(`❌ 回调处理失败: ${result.error || '未知错误'}`, 'error');
+        }
+      } catch (error) {
+        log(`❌ 网络错误: ${error.message}`, 'error');
+      }
+    }
+
+    // 自动检测回调参数
+    function autoDetectCallback() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      const state = urlParams.get('state');
+      const error = urlParams.get('error');
+      const errorDescription = urlParams.get('error_description');
+
+      if (error) {
+        log(`OAuth错误: ${error}${errorDescription ? ' - ' + errorDescription : ''}`, 'error');
+        return;
+      }
+
+      if (code && state) {
+        document.getElementById('callbackCode').value = code;
+        document.getElementById('callbackState').value = state;
+        document.getElementById('callbackServerName').value = 'testapp';
+
+        // 尝试从state中解析平台信息
+        try {
+          const decoded = atob(state.replace(/-/g, '+').replace(/_/g, '/'));
+          const stateData = JSON.parse(decoded);
+          log('✅ 检测到OAuth回调参数', 'success');
+          log(`用户ID: ${stateData.uid}`, 'info');
+          log(`服务器: ${stateData.server}`, 'info');
+        } catch (e) {
+          log('⚠️ 无法解析state参数，请手动选择平台', 'warning');
+        }
+      } else {
+        log('❌ 未检测到OAuth回调参数', 'error');
+      }
+    }
+
+    // 日志函数
+    function log(message, type = 'info') {
+      const output = document.getElementById('output');
+      const div = document.createElement('div');
+      div.className = `result ${type}`;
+      div.innerHTML = `<span class="status-indicator ${type}"></span>${new Date().toLocaleTimeString()}: ${message}`;
+      output.appendChild(div);
+      output.scrollTop = output.scrollHeight;
+
+      // 显示结果区域
+      document.getElementById('results').classList.remove('hidden');
+    }
+
+    // 清空结果
+    function clearResults() {
+      document.getElementById('output').innerHTML = '';
+      document.getElementById('results').classList.add('hidden');
+    }
+
+    // 页面加载时的初始化
+    window.onload = function () {
+      // 检查URL参数（用于OAuth回调）
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      const state = urlParams.get('state');
+
+      if (code && state) {
+        // 自动检测回调参数
+        setTimeout(autoDetectCallback, 500);
+      }
+    };
+  </script>
+</body>
+
+</html>

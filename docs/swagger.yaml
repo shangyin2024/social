@@ -1,0 +1,341 @@
+basePath: /
+definitions:
+  types.APIResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+      request_id:
+        type: string
+      status:
+        type: string
+    type: object
+  types.CallbackRequest:
+    properties:
+      code:
+        description: 授权码
+        example: authorization_code
+        minLength: 1
+        type: string
+      provider:
+        description: 平台名称
+        enum:
+        - youtube
+        - x
+        - facebook
+        - tiktok
+        - instagram
+        example: x
+        type: string
+      server_name:
+        description: 服务器名称
+        example: myapp
+        maxLength: 50
+        minLength: 1
+        type: string
+      state:
+        description: 状态参数，包含用户ID等信息
+        example: encoded_state_string
+        minLength: 1
+        type: string
+    required:
+    - code
+    - provider
+    - server_name
+    - state
+    type: object
+  types.ErrorResponse:
+    properties:
+      code:
+        type: string
+      error:
+        type: string
+      request_id:
+        type: string
+    type: object
+  types.ShareRequest:
+    properties:
+      content:
+        description: text content
+        example: Hello World!
+        maxLength: 280
+        type: string
+      description:
+        example: This is a description
+        maxLength: 500
+        type: string
+      media_url:
+        description: url to media (backend should download & upload)
+        example: https://example.com/image.jpg
+        type: string
+      privacy:
+        enum:
+        - public
+        - private
+        - unlisted
+        - friends
+        - followers
+        example: public
+        type: string
+      provider:
+        enum:
+        - youtube
+        - x
+        - facebook
+        - tiktok
+        - instagram
+        example: x
+        type: string
+      server_name:
+        example: myapp
+        maxLength: 50
+        minLength: 1
+        type: string
+      tags:
+        example:
+        - hello
+        - world
+        items:
+          type: string
+        maxItems: 10
+        type: array
+      title:
+        example: My Post
+        maxLength: 100
+        type: string
+      user_id:
+        example: user123
+        maxLength: 100
+        minLength: 1
+        type: string
+    required:
+    - provider
+    - server_name
+    - user_id
+    type: object
+  types.StartAuthRequest:
+    properties:
+      provider:
+        enum:
+        - youtube
+        - x
+        - facebook
+        - tiktok
+        - instagram
+        example: x
+        type: string
+      redirect_uri:
+        example: https://myapp.com/auth/callback
+        type: string
+      server_name:
+        example: myapp
+        maxLength: 50
+        minLength: 1
+        type: string
+      user_id:
+        example: user123
+        maxLength: 100
+        minLength: 1
+        type: string
+    required:
+    - provider
+    - redirect_uri
+    - server_name
+    - user_id
+    type: object
+  types.StatsRequest:
+    properties:
+      media_id:
+        example: "1234567890"
+        maxLength: 100
+        type: string
+      provider:
+        enum:
+        - youtube
+        - x
+        - facebook
+        - tiktok
+        - instagram
+        example: x
+        type: string
+      server_name:
+        example: myapp
+        maxLength: 50
+        minLength: 1
+        type: string
+      user_id:
+        example: user123
+        maxLength: 100
+        minLength: 1
+        type: string
+    required:
+    - provider
+    - server_name
+    - user_id
+    type: object
+host: test-pubproject.wondera.ai
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: 多平台社交媒体授权分享API
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Social Media Platform API
+  version: "1.0"
+paths:
+  /api/share:
+    post:
+      consumes:
+      - application/json
+      description: 将内容分享到指定的社交媒体平台
+      parameters:
+      - description: 分享请求参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.ShareRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 分享成功
+          schema:
+            $ref: '#/definitions/types.APIResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: 分享内容到社交媒体平台
+      tags:
+      - 分享
+  /api/stats:
+    post:
+      consumes:
+      - application/json
+      description: 获取指定媒体内容在社交媒体平台上的统计信息
+      parameters:
+      - description: 统计请求参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.StatsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 统计信息
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: 获取社交媒体内容统计信息
+      tags:
+      - 统计
+  /auth/callback:
+    post:
+      consumes:
+      - application/json
+      description: 前端收到第三方平台OAuth回调后，调用此接口处理授权码交换和token保存
+      parameters:
+      - description: 回调请求参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.CallbackRequest'
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: 成功响应" example:"ok - OAuth callback completed for user user123
+            provider x. You may close this window.
+          schema:
+            type: string
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: 处理OAuth回调
+      tags:
+      - 认证
+  /auth/start:
+    post:
+      consumes:
+      - application/json
+      description: 启动指定平台的OAuth授权流程，返回授权URL
+      parameters:
+      - description: 授权请求参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/types.StartAuthRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功响应
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: 开始OAuth授权流程
+      tags:
+      - 认证
+  /health:
+    get:
+      description: 检查服务健康状态，包括存储连接状态
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 健康状态
+          schema:
+            additionalProperties: true
+            type: object
+        "503":
+          description: 服务不可用
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: 健康检查
+      tags:
+      - 系统
+schemes:
+- https
+swagger: "2.0"

@@ -1,0 +1,78 @@
+# Development Environment Configuration
+server:
+  port: "8080"
+  base_url: "http://localhost:8080"
+
+redis:
+  addr: "localhost:6379"
+  password: ""
+  db: 0
+
+# Development OAuth configuration (use test credentials)
+oauth:
+  youtube:
+    client_id: "dev_youtube_client_id"
+    client_secret: "dev_youtube_client_secret"
+    scopes:
+      - "https://www.googleapis.com/auth/youtube.upload"
+      - "openid"
+      - "email"
+
+  x:
+    client_id: "dev_x_client_id"
+    client_secret: "dev_x_client_secret"
+    scopes:
+      - "tweet.read"
+      - "tweet.write"
+      - "users.read"
+      - "offline.access"
+
+  facebook:
+    client_id: "dev_facebook_app_id"
+    client_secret: "dev_facebook_app_secret"
+    scopes:
+      - "pages_manage_posts"
+      - "pages_read_engagement"
+      - "pages_show_list"
+      - "pages_read_user_content"
+
+  tiktok:
+    client_id: "dev_tiktok_client_id"
+    client_secret: "dev_tiktok_client_secret"
+    scopes:
+      - "video.upload"
+      - "user.info.basic"
+
+  instagram:
+    client_id: "dev_instagram_client_id"
+    client_secret: "dev_instagram_client_secret"
+    scopes:
+      - "instagram_content_publish"
+      - "pages_read_engagement"
+
+platform:
+  supported_providers:
+    - "youtube"
+    - "x"
+    - "facebook"
+    - "tiktok"
+    - "instagram"
+
+# Development multi-server configurations
+servers:
+  devapp:
+    youtube:
+      client_id: "devapp_youtube_client_id"
+      client_secret: "devapp_youtube_client_secret"
+      scopes:
+        - "https://www.googleapis.com/auth/youtube.upload"
+        - "openid"
+        - "email"
+    x:
+      client_id: "devapp_x_client_id"
+      client_secret: "devapp_x_client_secret"
+      scopes:
+        - "tweet.read"
+        - "tweet.write"
+        - "users.read"
+        - "offline.access"

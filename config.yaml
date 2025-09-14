@@ -1,0 +1,183 @@
+# Social Media Platform Configuration
+server:
+  port: "8084"
+  base_url: "https://test-pubproject.wondera.ai"
+
+redis:
+  addr: "127.0.0.1:6379"
+  password: ""
+  db: 0
+
+# 默认OAuth配置（向后兼容）
+oauth:
+  youtube:
+    client_id: "your_youtube_client_id"
+    client_secret: "your_youtube_client_secret"
+    scopes:
+      - "https://www.googleapis.com/auth/youtube.upload"
+      - "openid"
+      - "email"
+
+  x:
+    client_id: "WFpJZl9STzRkekh1VmZWUXBtRVY6MTpjaQ"
+    client_secret: "b0Z2pAQtNgFvWIYEHg3twgqQ9TrwnMwiZtPS3ioxrM1hveLQKC"
+    scopes:
+      - "tweet.read"
+      - "tweet.write"
+      - "users.read"
+      - "offline.access"
+
+  facebook:
+    client_id: "your_facebook_app_id"
+    client_secret: "your_facebook_app_secret"
+    scopes:
+      - "pages_manage_posts"
+      - "pages_read_engagement"
+      - "pages_show_list"
+      - "pages_read_user_content"
+
+  tiktok:
+    client_id: "your_tiktok_client_id"
+    client_secret: "your_tiktok_client_secret"
+    scopes:
+      - "video.upload"
+      - "user.info.basic"
+
+  instagram:
+    client_id: "your_instagram_client_id"
+    client_secret: "your_instagram_client_secret"
+    scopes:
+      - "instagram_content_publish"
+      - "pages_read_engagement"
+
+platform:
+  supported_providers:
+    - "youtube"
+    - "x"
+    - "facebook"
+    - "tiktok"
+    - "instagram"
+
+# 多项目配置
+# 每个项目可以有自己独立的OAuth配置
+servers:
+  # 项目1: 我的博客应用
+  myblog:
+    youtube:
+      client_id: "myblog_youtube_client_id"
+      client_secret: "myblog_youtube_client_secret"
+      scopes:
+        - "https://www.googleapis.com/auth/youtube.upload"
+        - "openid"
+        - "email"
+    x:
+      client_id: "myblog_x_client_id"
+      client_secret: "myblog_x_client_secret"
+      scopes:
+        - "tweet.read"
+        - "tweet.write"
+        - "users.read"
+        - "offline.access"
+    facebook:
+      client_id: "myblog_facebook_app_id"
+      client_secret: "myblog_facebook_app_secret"
+      scopes:
+        - "pages_manage_posts"
+        - "pages_read_engagement"
+        - "pages_show_list"
+        - "pages_read_user_content"
+
+  # 项目2: 企业营销工具
+  marketing:
+    youtube:
+      client_id: "marketing_youtube_client_id"
+      client_secret: "marketing_youtube_client_secret"
+      scopes:
+        - "https://www.googleapis.com/auth/youtube.upload"
+        - "https://www.googleapis.com/auth/youtube.readonly"
+        - "openid"
+        - "email"
+    x:
+      client_id: "marketing_x_client_id"
+      client_secret: "marketing_x_client_secret"
+      scopes:
+        - "tweet.read"
+        - "tweet.write"
+        - "users.read"
+        - "offline.access"
+        - "follows.read"
+        - "follows.write"
+    facebook:
+      client_id: "marketing_facebook_app_id"
+      client_secret: "marketing_facebook_app_secret"
+      scopes:
+        - "pages_manage_posts"
+        - "pages_read_engagement"
+        - "pages_show_list"
+        - "pages_read_user_content"
+        - "ads_management"
+    tiktok:
+      client_id: "marketing_tiktok_client_id"
+      client_secret: "marketing_tiktok_client_secret"
+      scopes:
+        - "video.upload"
+        - "user.info.basic"
+        - "video.list"
+    instagram:
+      client_id: "marketing_instagram_client_id"
+      client_secret: "marketing_instagram_client_secret"
+      scopes:
+        - "instagram_content_publish"
+        - "pages_read_engagement"
+        - "instagram_basic"
+
+  # 项目3: 测试应用
+  testapp:
+    youtube:
+      client_id: "testapp_youtube_client_id"
+      client_secret: "testapp_youtube_client_secret"
+      scopes:
+        - "https://www.googleapis.com/auth/youtube.upload"
+        - "openid"
+        - "email"
+    x:
+      client_id: "WFpJZl9STzRkekh1VmZWUXBtRVY6MTpjaQ"
+      client_secret: "b0Z2pAQtNgFvWIYEHg3twgqQ9TrwnMwiZtPS3ioxrM1hveLQKC"
+      scopes:
+        - "tweet.read"
+        - "tweet.write"
+        - "users.read"
+        - "offline.access"
+
+  # 项目4: 内容管理系统
+  cms:
+    youtube:
+      client_id: "cms_youtube_client_id"
+      client_secret: "cms_youtube_client_secret"
+      scopes:
+        - "https://www.googleapis.com/auth/youtube.upload"
+        - "https://www.googleapis.com/auth/youtube.readonly"
+        - "openid"
+        - "email"
+    x:
+      client_id: "cms_x_client_id"
+      client_secret: "cms_x_client_secret"
+      scopes:
+        - "tweet.read"
+        - "tweet.write"
+        - "users.read"
+        - "offline.access"
+    facebook:
+      client_id: "cms_facebook_app_id"
+      client_secret: "cms_facebook_app_secret"
+      scopes:
+        - "pages_manage_posts"
+        - "pages_read_engagement"
+        - "pages_show_list"
+        - "pages_read_user_content"
+    instagram:
+      client_id: "cms_instagram_client_id"
+      client_secret: "cms_instagram_client_secret"
+      scopes:
+        - "instagram_content_publish"
+        - "pages_read_engagement"
