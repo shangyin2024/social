@@ -44,5 +44,19 @@ func (t *TikTokPlatform) GetStats(ctx context.Context, client *http.Client, medi
 func (t *TikTokPlatform) HandleOAuthCallback(ctx context.Context, code, state string) error {
 	// TikTok平台特定的OAuth回调处理逻辑
 	// 这里可以添加TikTok平台特有的处理逻辑
+
+	// 验证授权码
+	if code == "" {
+		return fmt.Errorf("tiktok: authorization code is empty")
+	}
+
+	// 验证状态参数
+	if state == "" {
+		return fmt.Errorf("tiktok: state parameter is empty")
+	}
+
+	// 可以在这里添加额外的TikTok特定验证逻辑
+	// 例如：验证用户权限、记录授权日志等
+
 	return nil
 }

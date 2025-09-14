@@ -37,11 +37,11 @@ oauth:
       - "pages_read_user_content"
 
   tiktok:
-    client_id: "your_tiktok_client_id"
-    client_secret: "your_tiktok_client_secret"
+    client_id: "sbawdsdu68ec3qrq9a"
+    client_secret: "yifyVAOQYu5Yzh08DnTaBKx7Hm8DPQeO"
     scopes:
-      - "video.upload"
       - "user.info.basic"
+      - "video.upload"
 
   instagram:
     client_id: "your_instagram_client_id"
@@ -148,6 +148,12 @@ servers:
         - "tweet.write"
         - "users.read"
         - "offline.access"
+  tiktok:
+    client_id: "sbawdsdu68ec3qrq9a"
+    client_secret: "yifyVAOQYu5Yzh08DnTaBKx7Hm8DPQeO"
+    scopes:
+      - "video.upload"
+      - "user.info.basic"
 
   # 项目4: 内容管理系统
   cms:

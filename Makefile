@@ -68,3 +68,16 @@ config-validate:
 
 # 完整构建流程
 all: deps swagger build
+
+# 部署测试环境
+deploy:
+	GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o social main.go
+	upx social
+
+	ssh root@13.58.131.189 "rm /var/www/social/social"
+	scp social root@13.58.131.189:/var/www/social
+	scp ./static/* root@13.58.131.189:/var/www/social/static
+	# ssh root@13.58.131.189 "supervisorctl restart social"
+	rm social
+
+

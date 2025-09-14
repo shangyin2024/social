@@ -15,7 +15,7 @@ const (
 	FacebookTokenURL = "https://graph.facebook.com/v18.0/oauth/access_token"
 
 	// TikTok OAuth endpoints
-	TikTokAuthURL  = "https://www.tiktok.com/auth/authorize/"
+	TikTokAuthURL  = "https://www.tiktok.com/v2/auth/authorize/"
 	TikTokTokenURL = "https://open.tiktokapis.com/v2/oauth/token/"
 
 	// Instagram OAuth endpoints (uses Facebook)
@@ -46,8 +46,8 @@ var (
 	}
 
 	DefaultTikTokScopes = []string{
-		"video.upload",
 		"user.info.basic",
+		"video.upload",
 	}
 
 	DefaultInstagramScopes = []string{
