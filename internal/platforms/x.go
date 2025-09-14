@@ -76,6 +76,31 @@ func (x *XPlatform) Share(ctx context.Context, client *http.Client, req *types.S
 		return nil
 	}
 
+	// Parse error response for better error handling
+	var errorResponse struct {
+		Detail string `json:"detail"`
+		Title  string `json:"title"`
+		Status int    `json:"status"`
+		Type   string `json:"type"`
+	}
+	
+	if err := json.Unmarshal(body, &errorResponse); err == nil {
+		// Handle specific error cases
+		switch errorResponse.Status {
+		case 403:
+			if strings.Contains(errorResponse.Detail, "suspended") {
+				return fmt.Errorf("account suspended: %s", errorResponse.Detail)
+			}
+			return fmt.Errorf("access forbidden: %s", errorResponse.Detail)
+		case 401:
+			return fmt.Errorf("authentication failed: %s", errorResponse.Detail)
+		case 429:
+			return fmt.Errorf("rate limit exceeded: %s", errorResponse.Detail)
+		default:
+			return fmt.Errorf("x api error (%d): %s", errorResponse.Status, errorResponse.Detail)
+		}
+	}
+	
 	return fmt.Errorf("x api error: status=%d body=%s", resp.StatusCode, string(body))
 }
 
@@ -110,6 +135,56 @@ func (x *XPlatform) GetStats(ctx context.Context, client *http.Client, mediaID s
 	}
 
 	return result, nil
+}
+
+// CheckAccountStatus checks if the X account is in good standing
+func (x *XPlatform) CheckAccountStatus(ctx context.Context, client *http.Client) error {
+	req, err := http.NewRequestWithContext(ctx, "GET", "https://api.x.com/2/users/me", nil)
+	if err != nil {
+		return fmt.Errorf("failed to create account status request: %w", err)
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to check account status: %w", err)
+	}
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read account status response: %w", err)
+	}
+
+	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
+		// Account is in good standing
+		return nil
+	}
+
+	// Parse error response
+	var errorResponse struct {
+		Detail string `json:"detail"`
+		Title  string `json:"title"`
+		Status int    `json:"status"`
+		Type   string `json:"type"`
+	}
+	
+	if err := json.Unmarshal(body, &errorResponse); err == nil {
+		switch errorResponse.Status {
+		case 403:
+			if strings.Contains(errorResponse.Detail, "suspended") {
+				return fmt.Errorf("account suspended: %s", errorResponse.Detail)
+			}
+			return fmt.Errorf("access forbidden: %s", errorResponse.Detail)
+		case 401:
+			return fmt.Errorf("authentication failed: %s", errorResponse.Detail)
+		default:
+			return fmt.Errorf("account status check failed (%d): %s", errorResponse.Status, errorResponse.Detail)
+		}
+	}
+	
+	return fmt.Errorf("account status check failed: status=%d body=%s", resp.StatusCode, string(body))
 }
 
 // HandleOAuthCallback handles OAuth callback for X platform

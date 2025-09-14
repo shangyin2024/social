@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"context"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -109,11 +111,39 @@ func (h *ShareHandler) Share(c *gin.Context) {
 		return
 	}
 
+	// Check account status before sharing (for X platform)
+	if req.Provider == "x" {
+		h.logger.LogInfo(ctx, "checking account status", "provider", req.Provider, "user_id", req.UserID)
+		if xPlatform, ok := platform.(*platforms.XPlatform); ok {
+			if err := xPlatform.CheckAccountStatus(ctx, client); err != nil {
+				h.logger.LogError(ctx, err, "account status check failed", "provider", req.Provider, "user_id", req.UserID)
+				// Return a more specific error for account issues
+				if strings.Contains(err.Error(), "suspended") {
+					response.ErrorWithDetail(c, errors.ErrInternalServer, "账户已被暂停，请联系 X (Twitter) 客服解决")
+				} else {
+					response.ErrorWithDetail(c, errors.ErrInternalServer, fmt.Sprintf("账户状态检查失败: %v", err))
+				}
+				return
+			}
+		}
+	}
+
 	// Share content
 	h.logger.LogInfo(ctx, "sharing content", "provider", req.Provider, "user_id", req.UserID)
 	if err := platform.Share(ctx, client, &req); err != nil {
 		h.logger.LogError(ctx, err, "failed to share content", "provider", req.Provider, "user_id", req.UserID)
-		response.ErrorWithDetail(c, errors.ErrInternalServer, err.Error())
+		
+		// Provide more specific error messages based on error type
+		errorMsg := err.Error()
+		if strings.Contains(errorMsg, "account suspended") {
+			response.ErrorWithDetail(c, errors.ErrInternalServer, "账户已被暂停，请联系 X (Twitter) 客服解决")
+		} else if strings.Contains(errorMsg, "authentication failed") {
+			response.ErrorWithDetail(c, errors.ErrInternalServer, "认证失败，请重新授权")
+		} else if strings.Contains(errorMsg, "rate limit exceeded") {
+			response.ErrorWithDetail(c, errors.ErrInternalServer, "请求过于频繁，请稍后再试")
+		} else {
+			response.ErrorWithDetail(c, errors.ErrInternalServer, errorMsg)
+		}
 		return
 	}
 

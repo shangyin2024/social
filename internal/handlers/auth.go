@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -105,18 +106,26 @@ func (h *AuthHandler) StartAuth(c *gin.Context) {
 
 	// Store PKCE verifier if needed
 	if usePKCE && verifier != "" {
-		ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 		defer cancel()
 
-		h.logger.LogInfo(ctx, "saving PKCE verifier", "state", state, "verifier_length", len(verifier))
+		verifierPreview := verifier
+		if len(verifier) > 10 {
+			verifierPreview = verifier[:10]
+		}
+		h.logger.LogInfo(ctx, "saving PKCE verifier", "state", state, "verifier_length", len(verifier), "verifier_preview", verifierPreview)
 
 		if err := h.storage.SavePKCEVerifier(ctx, state, verifier); err != nil {
-			h.logger.LogError(ctx, err, "failed to save PKCE verifier")
+			h.logger.LogError(ctx, err, "failed to save PKCE verifier", "state", state, "verifier_length", len(verifier))
 			response.InternalServerError(c, "failed to save PKCE verifier")
 			return
 		}
 
-		h.logger.LogInfo(ctx, "PKCE verifier saved successfully", "state", state)
+		h.logger.LogInfo(ctx, "PKCE verifier saved successfully", "state", state, "verifier_length", len(verifier))
+	} else if usePKCE {
+		h.logger.LogError(ctx, errors.ErrInternalServer, "PKCE required but verifier is empty", "provider", req.Provider, "usePKCE", usePKCE, "verifier_empty", verifier == "")
+		response.InternalServerError(c, "PKCE verifier generation failed")
+		return
 	}
 
 	h.logger.LogInfo(ctx, "OAuth flow initiated", "provider", req.Provider, "user_id", req.UserID, "server_name", req.ServerName)
@@ -191,10 +200,26 @@ func (h *AuthHandler) Callback(c *gin.Context) {
 
 	// Get OAuth config with server-specific configuration
 	// Use the redirect URI from the request or default callback URL
+	// For token exchange, we need to use the exact same redirect_uri as used in authorization
 	redirectURI := req.RedirectURI
 	if redirectURI == "" {
 		redirectURI = "https://test-pubproject.wondera.ai/static/callback.html"
 	}
+
+	// For X platform, we need to ensure the redirect_uri matches exactly what was used in authorization
+	// Remove any query parameters that might have been added during the callback
+	if req.Provider == "x" {
+		h.logger.LogInfo(ctx, "processing X platform redirect_uri", "original_redirect_uri", redirectURI)
+		// Parse the redirect URI to remove query parameters
+		if parsedURL, err := url.Parse(redirectURI); err == nil {
+			parsedURL.RawQuery = ""
+			redirectURI = parsedURL.String()
+			h.logger.LogInfo(ctx, "cleaned X platform redirect_uri", "cleaned_redirect_uri", redirectURI)
+		} else {
+			h.logger.LogError(ctx, err, "failed to parse redirect_uri", "redirect_uri", redirectURI)
+		}
+	}
+
 	oauthConfig, err := h.config.GetServerOAuthConfig(req.Provider, serverName, redirectURI)
 	if err != nil {
 		h.logger.LogError(ctx, err, "failed to get OAuth config", "provider", req.Provider, "server_name", serverName)
@@ -208,10 +233,10 @@ func (h *AuthHandler) Callback(c *gin.Context) {
 	// Get PKCE verifier if needed (for X platform)
 	var verifier string
 	if req.Provider == "x" {
-		ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 		defer cancel()
 
-		h.logger.LogInfo(ctx, "getting PKCE verifier", "state", req.State)
+		h.logger.LogInfo(ctx, "getting PKCE verifier", "state", req.State, "provider", req.Provider)
 
 		verifier, err = h.storage.GetAndDeletePKCEVerifier(ctx, req.State)
 		if err != nil {
@@ -220,7 +245,11 @@ func (h *AuthHandler) Callback(c *gin.Context) {
 			return
 		}
 
-		h.logger.LogInfo(ctx, "PKCE verifier retrieved", "state", req.State, "verifier_length", len(verifier))
+		verifierPreview := verifier
+		if len(verifier) > 10 {
+			verifierPreview = verifier[:10]
+		}
+		h.logger.LogInfo(ctx, "PKCE verifier retrieved", "state", req.State, "verifier_length", len(verifier), "verifier_preview", verifierPreview)
 	}
 
 	// Exchange authorization code for token

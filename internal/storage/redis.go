@@ -111,10 +111,16 @@ func (r *RedisStorage) DeleteToken(ctx context.Context, userID, provider, server
 func (r *RedisStorage) SavePKCEVerifier(ctx context.Context, state, verifier string) error {
 	key := r.PKCEKey(state)
 
-	// PKCE verifiers should expire quickly (10 minutes)
-	expiration := 10 * time.Minute
+	// PKCE verifiers should expire quickly (30 minutes to allow for user interaction time)
+	expiration := 30 * time.Minute
 
 	fmt.Printf("DEBUG: Saving PKCE verifier to Redis with key: %s, verifier length: %d\n", key, len(verifier))
+
+	// Test Redis connection first
+	if err := r.client.Ping(ctx).Err(); err != nil {
+		fmt.Printf("DEBUG: Redis connection test failed: %v\n", err)
+		return fmt.Errorf("redis connection failed: %w", err)
+	}
 
 	err := r.client.Set(ctx, key, verifier, expiration).Err()
 	if err != nil {
@@ -122,7 +128,19 @@ func (r *RedisStorage) SavePKCEVerifier(ctx context.Context, state, verifier str
 		return err
 	}
 
-	fmt.Printf("DEBUG: PKCE verifier saved successfully to Redis with key: %s\n", key)
+	// Verify the save was successful
+	savedVerifier, err := r.client.Get(ctx, key).Result()
+	if err != nil {
+		fmt.Printf("DEBUG: Failed to verify PKCE verifier save: %v\n", err)
+		return fmt.Errorf("failed to verify PKCE verifier save: %w", err)
+	}
+
+	if savedVerifier != verifier {
+		fmt.Printf("DEBUG: PKCE verifier mismatch after save\n")
+		return fmt.Errorf("PKCE verifier mismatch after save")
+	}
+
+	fmt.Printf("DEBUG: PKCE verifier saved and verified successfully to Redis with key: %s\n", key)
 	return nil
 }
 
