@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户信息查询</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: #6c757d;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab.active {
+            color: #667eea;
+            background: white;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+
+        .section h3 {
+            color: #495057;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .input-group input,
+        .input-group textarea,
+        .input-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .result.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-indicator.success {
+            background: #28a745;
+        }
+
+        .status-indicator.error {
+            background: #dc3545;
+        }
+
+        .status-indicator.info {
+            background: #17a2b8;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .user-info-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .user-info-card h4 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .user-info-item {
+            display: flex;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .user-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .user-info-label {
+            font-weight: 600;
+            color: #495057;
+            min-width: 120px;
+            margin-right: 15px;
+        }
+
+        .user-info-value {
+            color: #6c757d;
+            flex: 1;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+        }
+
+        .verified-badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .tab-content {
+                padding: 20px;
+            }
+
+            .user-info-item {
+                flex-direction: column;
+            }
+
+            .user-info-label {
+                min-width: auto;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>用户信息查询</h1>
+            <p>查询各平台用户详细信息</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('youtube')">YouTube</button>
+            <button class="tab" onclick="switchTab('x')">X (Twitter)</button>
+            <button class="tab" onclick="switchTab('facebook')">Facebook</button>
+            <button class="tab" onclick="switchTab('tiktok')">TikTok</button>
+            <button class="tab" onclick="switchTab('instagram')">Instagram</button>
+        </div>
+
+        <!-- YouTube 用户信息 -->
+        <div id="youtube-tab" class="tab-content active">
+            <div class="section">
+                <h3>YouTube 用户信息查询</h3>
+                <div class="input-group">
+                    <label for="youtube-userId">用户ID:</label>
+                    <input type="text" id="youtube-userId" placeholder="输入用户ID">
+                </div>
+                <div class="input-group">
+                    <label for="youtube-serverName">服务器名称:</label>
+                    <input type="text" id="youtube-serverName" value="wondera" placeholder="输入服务器名称">
+                </div>
+                <button class="btn btn-primary" onclick="getUserInfo('youtube')">🔍 获取用户信息</button>
+                <button class="btn btn-success" onclick="checkTokenStatus('youtube')">🔐 检查授权状态</button>
+                <button class="btn btn-secondary" onclick="clearResults('youtube')">🗑️ 清空结果</button>
+            </div>
+
+            <div id="youtube-results" class="section hidden">
+                <h3>查询结果</h3>
+                <div id="youtube-output"></div>
+            </div>
+        </div>
+
+        <!-- X (Twitter) 用户信息 -->
+        <div id="x-tab" class="tab-content">
+            <div class="section">
+                <h3>X (Twitter) 用户信息查询</h3>
+                <div class="input-group">
+                    <label for="x-userId">用户ID:</label>
+                    <input type="text" id="x-userId" placeholder="输入用户ID">
+                </div>
+                <div class="input-group">
+                    <label for="x-serverName">服务器名称:</label>
+                    <input type="text" id="x-serverName" value="wondera" placeholder="输入服务器名称">
+                </div>
+                <button class="btn btn-primary" onclick="getUserInfo('x')">🔍 获取用户信息</button>
+                <button class="btn btn-success" onclick="checkTokenStatus('x')">🔐 检查授权状态</button>
+                <button class="btn btn-secondary" onclick="clearResults('x')">🗑️ 清空结果</button>
+            </div>
+
+            <div id="x-results" class="section hidden">
+                <h3>查询结果</h3>
+                <div id="x-output"></div>
+            </div>
+        </div>
+
+        <!-- Facebook 用户信息 -->
+        <div id="facebook-tab" class="tab-content">
+            <div class="section">
+                <h3>Facebook 用户信息查询</h3>
+                <div class="input-group">
+                    <label for="facebook-userId">用户ID:</label>
+                    <input type="text" id="facebook-userId" placeholder="输入用户ID">
+                </div>
+                <div class="input-group">
+                    <label for="facebook-serverName">服务器名称:</label>
+                    <input type="text" id="facebook-serverName" value="wondera" placeholder="输入服务器名称">
+                </div>
+                <button class="btn btn-primary" onclick="getUserInfo('facebook')">🔍 获取用户信息</button>
+                <button class="btn btn-success" onclick="checkTokenStatus('facebook')">🔐 检查授权状态</button>
+                <button class="btn btn-secondary" onclick="clearResults('facebook')">🗑️ 清空结果</button>
+            </div>
+
+            <div id="facebook-results" class="section hidden">
+                <h3>查询结果</h3>
+                <div id="facebook-output"></div>
+            </div>
+        </div>
+
+        <!-- TikTok 用户信息 -->
+        <div id="tiktok-tab" class="tab-content">
+            <div class="section">
+                <h3>TikTok 用户信息查询</h3>
+                <div class="input-group">
+                    <label for="tiktok-userId">用户ID:</label>
+                    <input type="text" id="tiktok-userId" placeholder="输入用户ID">
+                </div>
+                <div class="input-group">
+                    <label for="tiktok-serverName">服务器名称:</label>
+                    <input type="text" id="tiktok-serverName" value="wondera" placeholder="输入服务器名称">
+                </div>
+                <button class="btn btn-primary" onclick="getUserInfo('tiktok')">🔍 获取用户信息</button>
+                <button class="btn btn-success" onclick="checkTokenStatus('tiktok')">🔐 检查授权状态</button>
+                <button class="btn btn-secondary" onclick="clearResults('tiktok')">🗑️ 清空结果</button>
+            </div>
+
+            <div id="tiktok-results" class="section hidden">
+                <h3>查询结果</h3>
+                <div id="tiktok-output"></div>
+            </div>
+        </div>
+
+        <!-- Instagram 用户信息 -->
+        <div id="instagram-tab" class="tab-content">
+            <div class="section">
+                <h3>Instagram 用户信息查询</h3>
+                <div class="input-group">
+                    <label for="instagram-userId">用户ID:</label>
+                    <input type="text" id="instagram-userId" placeholder="输入用户ID">
+                </div>
+                <div class="input-group">
+                    <label for="instagram-serverName">服务器名称:</label>
+                    <input type="text" id="instagram-serverName" value="wondera" placeholder="输入服务器名称">
+                </div>
+                <button class="btn btn-primary" onclick="getUserInfo('instagram')">🔍 获取用户信息</button>
+                <button class="btn btn-success" onclick="checkTokenStatus('instagram')">🔐 检查授权状态</button>
+                <button class="btn btn-secondary" onclick="clearResults('instagram')">🗑️ 清空结果</button>
+            </div>
+
+            <div id="instagram-results" class="section hidden">
+                <h3>查询结果</h3>
+                <div id="instagram-output"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+
+        // 切换标签页
+        function switchTab(platform) {
+            // 隐藏所有标签内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // 显示选中的标签内容
+            document.getElementById(`${platform}-tab`).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // 获取用户信息
+        async function getUserInfo(platform) {
+            const userId = document.getElementById(`${platform}-userId`).value;
+            const serverName = document.getElementById(`${platform}-serverName`).value;
+
+            if (!userId || !serverName) {
+                alert('请填写用户ID和服务器名称');
+                return;
+            }
+
+            try {
+                log(platform, '开始获取用户信息...', 'info');
+                log(platform, `平台: ${platform}`, 'info');
+                log(platform, `用户ID: ${userId}`, 'info');
+                log(platform, `服务器: ${serverName}`, 'info');
+
+                const response = await fetch(`${API_BASE}/auth/user-info`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        provider: platform,
+                        user_id: userId,
+                        server_name: serverName
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    log(platform, '✅ 用户信息获取成功！', 'success');
+
+                    // 显示用户信息卡片
+                    displayUserInfo(platform, result.data.user_info);
+
+                    log(platform, `完整响应: ${JSON.stringify(result, null, 2)}`, 'info');
+                } else {
+                    log(platform, `❌ 获取用户信息失败: ${result.error || '未知错误'}`, 'error');
+                    if (result.detail) {
+                        log(platform, `错误详情: ${result.detail}`, 'error');
+                    }
+                }
+            } catch (error) {
+                log(platform, `❌ 网络错误: ${error.message}`, 'error');
+            }
+        }
+
+        // 检查授权状态
+        async function checkTokenStatus(platform) {
+            const userId = document.getElementById(`${platform}-userId`).value;
+            const serverName = document.getElementById(`${platform}-serverName`).value;
+
+            if (!userId || !serverName) {
+                alert('请填写用户ID和服务器名称');
+                return;
+            }
+
+            try {
+                log(platform, '检查授权状态...', 'info');
+
+                const response = await fetch(`${API_BASE}/auth/check-token-status`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        provider: platform,
+                        user_id: userId,
+                        server_name: serverName
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    const status = result.data;
+                    if (status.exists) {
+                        if (status.is_valid) {
+                            log(platform, '✅ Token存在且有效', 'success');
+                            if (status.expires_at) {
+                                const expiresDate = new Date(status.expires_at * 1000);
+                                log(platform, `Token过期时间: ${expiresDate.toLocaleString()}`, 'info');
+                            }
+                        } else {
+                            log(platform, '⚠️ Token存在但已过期', 'error');
+                        }
+                    } else {
+                        log(platform, '❌ Token不存在，请先完成授权', 'error');
+                    }
+                    log(platform, `状态消息: ${status.message}`, 'info');
+                } else {
+                    log(platform, `❌ 检查授权状态失败: ${result.error || '未知错误'}`, 'error');
+                }
+            } catch (error) {
+                log(platform, `❌ 网络错误: ${error.message}`, 'error');
+            }
+        }
+
+        // 显示用户信息卡片
+        function displayUserInfo(platform, userInfo) {
+            const output = document.getElementById(`${platform}-output`);
+
+            // 创建用户信息卡片
+            const card = document.createElement('div');
+            card.className = 'user-info-card';
+
+            let avatarHtml = '';
+            if (userInfo.avatar_url) {
+                avatarHtml = `<img src="${userInfo.avatar_url}" alt="头像" class="user-avatar" onerror="this.style.display='none'">`;
+            }
+
+            let verifiedBadge = '';
+            if (userInfo.verified) {
+                verifiedBadge = '<span class="verified-badge">✓ 认证</span>';
+            }
+
+            card.innerHTML = `
+        ${avatarHtml}
+        <h4>${userInfo.display_name || userInfo.username}${verifiedBadge}</h4>
+        <div class="user-info-item">
+          <div class="user-info-label">平台ID:</div>
+          <div class="user-info-value">${userInfo.id}</div>
+        </div>
+        <div class="user-info-item">
+          <div class="user-info-label">用户名:</div>
+          <div class="user-info-value">${userInfo.username || 'N/A'}</div>
+        </div>
+        <div class="user-info-item">
+          <div class="user-info-label">显示名称:</div>
+          <div class="user-info-value">${userInfo.display_name || 'N/A'}</div>
+        </div>
+        ${userInfo.email ? `
+        <div class="user-info-item">
+          <div class="user-info-label">邮箱:</div>
+          <div class="user-info-value">${userInfo.email}</div>
+        </div>
+        ` : ''}
+        ${userInfo.profile_url ? `
+        <div class="user-info-item">
+          <div class="user-info-label">个人资料:</div>
+          <div class="user-info-value"><a href="${userInfo.profile_url}" target="_blank">${userInfo.profile_url}</a></div>
+        </div>
+        ` : ''}
+        ${userInfo.followers !== undefined ? `
+        <div class="user-info-item">
+          <div class="user-info-label">粉丝数:</div>
+          <div class="user-info-value">${userInfo.followers.toLocaleString()}</div>
+        </div>
+        ` : ''}
+        ${userInfo.following !== undefined ? `
+        <div class="user-info-item">
+          <div class="user-info-label">关注数:</div>
+          <div class="user-info-value">${userInfo.following.toLocaleString()}</div>
+        </div>
+        ` : ''}
+      `;
+
+            // 清空之前的结果并添加新卡片
+            output.innerHTML = '';
+            output.appendChild(card);
+        }
+
+        // 日志函数
+        function log(platform, message, type = 'info') {
+            const output = document.getElementById(`${platform}-output`);
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = `<span class="status-indicator ${type}"></span>${new Date().toLocaleTimeString()}: ${message}`;
+            output.appendChild(div);
+            output.scrollTop = output.scrollHeight;
+
+            // 显示结果区域
+            document.getElementById(`${platform}-results`).classList.remove('hidden');
+        }
+
+        // 清空结果
+        function clearResults(platform) {
+            document.getElementById(`${platform}-output`).innerHTML = '';
+            document.getElementById(`${platform}-results`).classList.add('hidden');
+        }
+
+        // 页面加载时的初始化
+        window.onload = function () {
+            // 从localStorage恢复用户ID（如果存在）
+            const platforms = ['youtube', 'x', 'facebook', 'tiktok', 'instagram'];
+            platforms.forEach(platform => {
+                const savedUserId = localStorage.getItem(`${platform}_user_id`);
+                if (savedUserId) {
+                    document.getElementById(`${platform}-userId`).value = savedUserId;
+                }
+            });
+        };
+
+        // 保存用户ID到localStorage
+        function saveUserId(platform, userId) {
+            if (userId) {
+                localStorage.setItem(`${platform}_user_id`, userId);
+            }
+        }
+
+        // 为所有用户ID输入框添加保存功能
+        document.addEventListener('DOMContentLoaded', function () {
+            const platforms = ['youtube', 'x', 'facebook', 'tiktok', 'instagram'];
+            platforms.forEach(platform => {
+                const input = document.getElementById(`${platform}-userId`);
+                input.addEventListener('blur', function () {
+                    saveUserId(platform, this.value);
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

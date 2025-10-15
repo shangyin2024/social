@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社交媒体内容分享</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: #6c757d;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab.active {
+            color: #667eea;
+            background: white;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+
+        .section h3 {
+            color: #495057;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .input-group input,
+        .input-group textarea,
+        .input-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .input-group textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .result.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-indicator.success {
+            background: #28a745;
+        }
+
+        .status-indicator.error {
+            background: #dc3545;
+        }
+
+        .status-indicator.info {
+            background: #17a2b8;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .tab-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>社交媒体内容分享</h1>
+            <p>分享内容到各个社交媒体平台</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('youtube')">YouTube</button>
+            <button class="tab" onclick="switchTab('x')">X (Twitter)</button>
+            <button class="tab" onclick="switchTab('facebook')">Facebook</button>
+            <button class="tab" onclick="switchTab('tiktok')">TikTok</button>
+            <button class="tab" onclick="switchTab('instagram')">Instagram</button>
+        </div>
+
+        <!-- YouTube 分享 -->
+        <div id="youtube-tab" class="tab-content active">
+            <div class="section">
+                <h3>YouTube 分享配置</h3>
+                <div class="input-group">
+                    <label for="youtube-userId">用户ID:</label>
+                    <input type="text" id="youtube-userId" value="debug-user-123" placeholder="输入用户ID">
+                </div>
+                <div class="input-group">
+                    <label for="youtube-serverName">服务器名称:</label>
+                    <select id="youtube-serverName">
+                        <option value="default">default (使用默认配置)</option>
+                        <option value="wondera">wondera (使用服务器配置)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>📝 分享内容</h3>
+                <div class="input-group">
+                    <label for="youtube-content">内容:</label>
+                    <textarea id="youtube-content" placeholder="输入要分享的内容"
+                        maxlength="5000">🌤️ 美丽的天空和云朵！今天天气真好，风向也很不错。分享一张美丽的风景照片给大家！ #风向 #天气 #自然 #风景</textarea>
+                </div>
+                <div class="input-group">
+                    <label for="youtube-mediaUrl">媒体URL (可选):</label>
+                    <input type="url" id="youtube-mediaUrl"
+                        value="https://d20r62ijagu47n.cloudfront.net/1755482887937-ymoolaca.png"
+                        placeholder="https://example.com/video.mp4">
+                </div>
+                <div class="input-group">
+                    <label for="youtube-tags">标签 (可选，用逗号分隔):</label>
+                    <input type="text" id="youtube-tags" value="风向,天气,自然,风景,美丽,摄影,天空,云朵" placeholder="tag1,tag2,tag3">
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🎯 操作</h3>
+                <button class="btn btn-primary" onclick="shareContent('youtube')">📤 分享到YouTube</button>
+                <button class="btn btn-success" onclick="getUserInfo('youtube')">👤 获取用户信息</button>
+                <button class="btn btn-secondary" onclick="clearResults('youtube')">🗑️ 清空结果</button>
+            </div>
+
+            <div id="youtube-results" class="section hidden">
+                <h3>📊 分享结果</h3>
+                <div id="youtube-output"></div>
+            </div>
+        </div>
+
+        <!-- X (Twitter) 分享 -->
+        <div id="x-tab" class="tab-content">
+            <div class="section">
+                <h3>X (Twitter) 分享配置</h3>
+                <div class="input-group">
+                    <label for="x-userId">用户ID:</label>
+                    <input type="text" id="x-userId" value="debug-user-123" placeholder="输入用户ID">
+                </div>
+                <div class="input-group">
+                    <label for="x-serverName">服务器名称:</label>
+                    <select id="x-serverName">
+                        <option value="default">default (使用默认配置)</option>
+                        <option value="wondera">wondera (使用服务器配置)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>📝 分享内容</h3>
+                <div class="input-group">
+                    <label for="x-content">内容:</label>
+                    <textarea id="x-content" placeholder="输入要分享的内容（最多280字符）"
+                        maxlength="280">🌤️ 美丽的天空和云朵！今天天气真好，风向也很不错。分享一张美丽的风景照片给大家！ #风向 #天气 #自然 #风景</textarea>
+                </div>
+                <div class="input-group">
+                    <label for="x-mediaUrl">媒体URL (可选):</label>
+                    <input type="url" id="x-mediaUrl"
+                        value="https://d20r62ijagu47n.cloudfront.net/1755482887937-ymoolaca.png"
+                        placeholder="https://example.com/image.jpg">
+                </div>
+                <div class="input-group">
+                    <label for="x-tags">标签 (可选，用逗号分隔):</label>
+                    <input type="text" id="x-tags" value="风向,天气,自然,风景,美丽,摄影,天空,云朵" placeholder="tag1,tag2,tag3">
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🎯 操作</h3>
+                <button class="btn btn-primary" onclick="shareContent('x')">📤 分享到X</button>
+                <button class="btn btn-success" onclick="getUserInfo('x')">👤 获取用户信息</button>
+                <button class="btn btn-secondary" onclick="clearResults('x')">🗑️ 清空结果</button>
+            </div>
+
+            <div id="x-results" class="section hidden">
+                <h3>📊 分享结果</h3>
+                <div id="x-output"></div>
+            </div>
+        </div>
+
+        <!-- Facebook 分享 -->
+        <div id="facebook-tab" class="tab-content">
+            <div class="section">
+                <h3>Facebook 分享配置</h3>
+                <div class="input-group">
+                    <label for="facebook-userId">用户ID:</label>
+                    <input type="text" id="facebook-userId" value="debug-user-123" placeholder="输入用户ID">
+                </div>
+                <div class="input-group">
+                    <label for="facebook-serverName">服务器名称:</label>
+                    <select id="facebook-serverName">
+                        <option value="default">default (使用默认配置)</option>
+                        <option value="wondera">wondera (使用服务器配置)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>📝 分享内容</h3>
+                <div class="input-group">
+                    <label for="facebook-content">内容:</label>
+                    <textarea id="facebook-content" placeholder="输入要分享的内容"
+                        maxlength="63206">🌤️ 美丽的天空和云朵！今天天气真好，风向也很不错。分享一张美丽的风景照片给大家！ #风向 #天气 #自然 #风景</textarea>
+                </div>
+                <div class="input-group">
+                    <label for="facebook-mediaUrl">媒体URL (可选):</label>
+                    <input type="url" id="facebook-mediaUrl"
+                        value="https://d20r62ijagu47n.cloudfront.net/1755482887937-ymoolaca.png"
+                        placeholder="https://example.com/image.jpg">
+                </div>
+                <div class="input-group">
+                    <label for="facebook-tags">标签 (可选，用逗号分隔):</label>
+                    <input type="text" id="facebook-tags" value="风向,天气,自然,风景,美丽,摄影,天空,云朵" placeholder="tag1,tag2,tag3">
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🎯 操作</h3>
+                <button class="btn btn-primary" onclick="shareContent('facebook')">📤 分享到Facebook</button>
+                <button class="btn btn-success" onclick="getUserInfo('facebook')">👤 获取用户信息</button>
+                <button class="btn btn-secondary" onclick="clearResults('facebook')">🗑️ 清空结果</button>
+            </div>
+
+            <div id="facebook-results" class="section hidden">
+                <h3>📊 分享结果</h3>
+                <div id="facebook-output"></div>
+            </div>
+        </div>
+
+        <!-- TikTok 分享 -->
+        <div id="tiktok-tab" class="tab-content">
+            <div class="section">
+                <h3>TikTok 分享配置</h3>
+                <div class="input-group">
+                    <label for="tiktok-userId">用户ID:</label>
+                    <input type="text" id="tiktok-userId" value="debug-user-123" placeholder="输入用户ID">
+                </div>
+                <div class="input-group">
+                    <label for="tiktok-serverName">服务器名称:</label>
+                    <select id="tiktok-serverName">
+                        <option value="default">default (使用默认配置)</option>
+                        <option value="wondera">wondera (使用服务器配置)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>📝 分享内容</h3>
+                <div class="input-group">
+                    <label for="tiktok-content">内容:</label>
+                    <textarea id="tiktok-content" placeholder="输入要分享的内容"
+                        maxlength="2200">🌤️ 美丽的天空和云朵！今天天气真好，风向也很不错。分享一张美丽的风景照片给大家！ #风向 #天气 #自然 #风景</textarea>
+                </div>
+                <div class="input-group">
+                    <label for="tiktok-mediaUrl">媒体URL (可选):</label>
+                    <input type="url" id="tiktok-mediaUrl"
+                        value="https://d20r62ijagu47n.cloudfront.net/1755482887937-ymoolaca.png"
+                        placeholder="https://example.com/video.mp4">
+                </div>
+                <div class="input-group">
+                    <label for="tiktok-tags">标签 (可选，用逗号分隔):</label>
+                    <input type="text" id="tiktok-tags" value="风向,天气,自然,风景,美丽,摄影,天空,云朵" placeholder="tag1,tag2,tag3">
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🎯 操作</h3>
+                <button class="btn btn-primary" onclick="shareContent('tiktok')">📤 分享到TikTok</button>
+                <button class="btn btn-success" onclick="getUserInfo('tiktok')">👤 获取用户信息</button>
+                <button class="btn btn-secondary" onclick="clearResults('tiktok')">🗑️ 清空结果</button>
+            </div>
+
+            <div id="tiktok-results" class="section hidden">
+                <h3>📊 分享结果</h3>
+                <div id="tiktok-output"></div>
+            </div>
+        </div>
+
+        <!-- Instagram 分享 -->
+        <div id="instagram-tab" class="tab-content">
+            <div class="section">
+                <h3>Instagram 分享配置</h3>
+                <div class="input-group">
+                    <label for="instagram-userId">用户ID:</label>
+                    <input type="text" id="instagram-userId" value="debug-user-123" placeholder="输入用户ID">
+                </div>
+                <div class="input-group">
+                    <label for="instagram-serverName">服务器名称:</label>
+                    <select id="instagram-serverName">
+                        <option value="default">default (使用默认配置)</option>
+                        <option value="wondera">wondera (使用服务器配置)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>📝 分享内容</h3>
+                <div class="input-group">
+                    <label for="instagram-content">内容:</label>
+                    <textarea id="instagram-content" placeholder="输入要分享的内容"
+                        maxlength="2200">🌤️ 美丽的天空和云朵！今天天气真好，风向也很不错。分享一张美丽的风景照片给大家！ #风向 #天气 #自然 #风景</textarea>
+                </div>
+                <div class="input-group">
+                    <label for="instagram-mediaUrl">媒体URL (可选):</label>
+                    <input type="url" id="instagram-mediaUrl"
+                        value="https://d20r62ijagu47n.cloudfront.net/1755482887937-ymoolaca.png"
+                        placeholder="https://example.com/image.jpg">
+                </div>
+                <div class="input-group">
+                    <label for="instagram-tags">标签 (可选，用逗号分隔):</label>
+                    <input type="text" id="instagram-tags" value="风向,天气,自然,风景,美丽,摄影,天空,云朵" placeholder="tag1,tag2,tag3">
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🎯 操作</h3>
+                <button class="btn btn-primary" onclick="shareContent('instagram')">📤 分享到Instagram</button>
+                <button class="btn btn-success" onclick="getUserInfo('instagram')">👤 获取用户信息</button>
+                <button class="btn btn-secondary" onclick="clearResults('instagram')">🗑️ 清空结果</button>
+            </div>
+
+            <div id="instagram-results" class="section hidden">
+                <h3>📊 分享结果</h3>
+                <div id="instagram-output"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+
+        // 切换标签页
+        function switchTab(platform) {
+            // 隐藏所有标签内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // 显示选中的标签内容
+            document.getElementById(`${platform}-tab`).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // 分享内容
+        async function shareContent(platform) {
+            const userId = document.getElementById(`${platform}-userId`).value;
+            const serverName = document.getElementById(`${platform}-serverName`).value;
+            const content = document.getElementById(`${platform}-content`).value;
+            const mediaUrl = document.getElementById(`${platform}-mediaUrl`).value;
+            const tags = document.getElementById(`${platform}-tags`).value;
+
+            if (!userId || !content) {
+                alert('请填写用户ID和分享内容');
+                return;
+            }
+
+            try {
+                log(platform, '开始分享内容...', 'info');
+                log(platform, `平台: ${platform}`, 'info');
+                log(platform, `用户ID: ${userId}`, 'info');
+                log(platform, `内容: ${content}`, 'info');
+
+                const requestData = {
+                    provider: platform,
+                    user_id: userId,
+                    server_name: serverName,
+                    content: content
+                };
+
+                if (mediaUrl) {
+                    requestData.media_url = mediaUrl;
+                }
+                if (tags) {
+                    requestData.tags = tags.split(',').map(tag => tag.trim()).filter(tag => tag);
+                }
+
+                const response = await fetch(`${API_BASE}/api/share`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    log(platform, '✅ 内容分享成功！', 'success');
+                    log(platform, `完整响应: ${JSON.stringify(result, null, 2)}`, 'info');
+                } else {
+                    log(platform, `❌ 分享失败: ${result.error || '未知错误'}`, 'error');
+                    if (result.code) {
+                        log(platform, `错误代码: ${result.code}`, 'error');
+                    }
+                }
+            } catch (error) {
+                log(platform, `❌ 网络错误: ${error.message}`, 'error');
+            }
+        }
+
+        // 获取用户信息
+        async function getUserInfo(platform) {
+            const userId = document.getElementById(`${platform}-userId`).value;
+            const serverName = document.getElementById(`${platform}-serverName`).value;
+
+            if (!userId) {
+                alert('请输入用户ID');
+                return;
+            }
+
+            log(platform, '获取用户信息...', 'info');
+            // 这里可以添加获取用户信息的API调用
+            log(platform, '用户信息获取功能待实现', 'info');
+        }
+
+        // 日志函数
+        function log(platform, message, type = 'info') {
+            const output = document.getElementById(`${platform}-output`);
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = `<span class="status-indicator ${type}"></span>${new Date().toLocaleTimeString()}: ${message}`;
+            output.appendChild(div);
+            output.scrollTop = output.scrollHeight;
+
+            // 显示结果区域
+            document.getElementById(`${platform}-results`).classList.remove('hidden');
+        }
+
+        // 清空结果
+        function clearResults(platform) {
+            document.getElementById(`${platform}-output`).innerHTML = '';
+            document.getElementById(`${platform}-results`).classList.add('hidden');
+        }
+
+        // 页面加载时的初始化
+        window.onload = function () {
+            // 初始化默认值
+            const platforms = ['youtube', 'x', 'facebook', 'tiktok', 'instagram'];
+            platforms.forEach(platform => {
+                // 设置默认用户ID
+                document.getElementById(`${platform}-userId`).value = 'debug-user-123';
+            });
+        };
+    </script>
+</body>
+
+</html>

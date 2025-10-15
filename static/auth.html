@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>社交媒体平台授权</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      font-weight: 300;
+    }
+
+    .header p {
+      opacity: 0.9;
+      font-size: 1.1em;
+    }
+
+    .tabs {
+      display: flex;
+      background: #f8f9fa;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-size: 16px;
+      font-weight: 500;
+      color: #6c757d;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .tab.active {
+      color: #667eea;
+      background: white;
+    }
+
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: #667eea;
+    }
+
+    .tab-content {
+      display: none;
+      padding: 30px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .section {
+      margin-bottom: 30px;
+      padding: 25px;
+      border: 1px solid #e9ecef;
+      border-radius: 10px;
+      background: #f8f9fa;
+    }
+
+    .section h3 {
+      color: #495057;
+      margin-bottom: 20px;
+      font-size: 1.3em;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #495057;
+    }
+
+    .input-group input,
+    .input-group textarea,
+    .input-group select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+
+    .input-group input:focus,
+    .input-group textarea:focus,
+    .input-group select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .btn {
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5a6fd8;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 13px;
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .result.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .result.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .result.info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .status-indicator {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    .status-indicator.success {
+      background: #28a745;
+    }
+
+    .status-indicator.error {
+      background: #dc3545;
+    }
+
+    .status-indicator.info {
+      background: #17a2b8;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .tabs {
+        flex-direction: column;
+      }
+
+      .container {
+        margin: 10px;
+        border-radius: 10px;
+      }
+
+      .header {
+        padding: 20px;
+      }
+
+      .header h1 {
+        font-size: 2em;
+      }
+
+      .tab-content {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>社交媒体平台授权</h1>
+      <p>选择平台并完成OAuth授权</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('youtube')">YouTube</button>
+      <button class="tab" onclick="switchTab('x')">X (Twitter)</button>
+      <button class="tab" onclick="switchTab('facebook')">Facebook</button>
+      <button class="tab" onclick="switchTab('tiktok')">TikTok</button>
+      <button class="tab" onclick="switchTab('instagram')">Instagram</button>
+    </div>
+
+    <!-- YouTube 授权 -->
+    <div id="youtube-tab" class="tab-content active">
+      <div class="section">
+        <h3>YouTube 授权配置</h3>
+        <div class="input-group">
+          <label for="youtube-userId">用户ID:</label>
+          <input type="text" id="youtube-userId" readonly placeholder="自动生成的UUID">
+        </div>
+        <div class="input-group">
+          <label for="youtube-serverName">服务器名称:</label>
+          <input type="text" id="youtube-serverName" value="wondera" placeholder="输入服务器名称">
+        </div>
+        <div class="input-group">
+          <label for="youtube-redirectUri">重定向URI:</label>
+          <input type="text" id="youtube-redirectUri" value="https://test-pubproject.wondera.io/static/callback.html"
+            placeholder="留空使用默认回调页面">
+        </div>
+        <button class="btn btn-primary" onclick="startAuth('youtube')">开始YouTube授权</button>
+        <button class="btn btn-secondary" onclick="clearResults('youtube')">清空结果</button>
+      </div>
+
+      <div id="youtube-results" class="section hidden">
+        <h3>授权结果</h3>
+        <div id="youtube-output"></div>
+      </div>
+    </div>
+
+    <!-- X (Twitter) 授权 -->
+    <div id="x-tab" class="tab-content">
+      <div class="section">
+        <h3>X (Twitter) 授权配置</h3>
+        <div class="input-group">
+          <label for="x-userId">用户ID:</label>
+          <input type="text" id="x-userId" readonly placeholder="自动生成的UUID">
+        </div>
+        <div class="input-group">
+          <label for="x-serverName">服务器名称:</label>
+          <input type="text" id="x-serverName" value="wondera" placeholder="输入服务器名称">
+        </div>
+        <div class="input-group">
+          <label for="x-redirectUri">重定向URI:</label>
+          <input type="text" id="x-redirectUri" value="" placeholder="留空使用默认回调页面">
+        </div>
+        <button class="btn btn-primary" onclick="startAuth('x')">开始X授权</button>
+        <button class="btn btn-secondary" onclick="clearResults('x')">清空结果</button>
+      </div>
+
+      <div id="x-results" class="section hidden">
+        <h3>授权结果</h3>
+        <div id="x-output"></div>
+      </div>
+    </div>
+
+    <!-- Facebook 授权 -->
+    <div id="facebook-tab" class="tab-content">
+      <div class="section">
+        <h3>Facebook 授权配置</h3>
+        <div class="input-group">
+          <label for="facebook-userId">用户ID:</label>
+          <input type="text" id="facebook-userId" readonly placeholder="自动生成的UUID">
+        </div>
+        <div class="input-group">
+          <label for="facebook-serverName">服务器名称:</label>
+          <input type="text" id="facebook-serverName" value="wondera" placeholder="输入服务器名称">
+        </div>
+        <div class="input-group">
+          <label for="facebook-redirectUri">重定向URI:</label>
+          <input type="text" id="facebook-redirectUri" value="" placeholder="留空使用默认回调页面">
+        </div>
+        <button class="btn btn-primary" onclick="startAuth('facebook')">开始Facebook授权</button>
+        <button class="btn btn-secondary" onclick="clearResults('facebook')">清空结果</button>
+      </div>
+
+      <div id="facebook-results" class="section hidden">
+        <h3>授权结果</h3>
+        <div id="facebook-output"></div>
+      </div>
+    </div>
+
+    <!-- TikTok 授权 -->
+    <div id="tiktok-tab" class="tab-content">
+      <div class="section">
+        <h3>TikTok 授权配置</h3>
+        <div class="input-group">
+          <label for="tiktok-userId">用户ID:</label>
+          <input type="text" id="tiktok-userId" readonly placeholder="自动生成的UUID">
+        </div>
+        <div class="input-group">
+          <label for="tiktok-serverName">服务器名称:</label>
+          <input type="text" id="tiktok-serverName" value="wondera" placeholder="输入服务器名称">
+        </div>
+        <div class="input-group">
+          <label for="tiktok-redirectUri">重定向URI:</label>
+          <input type="text" id="tiktok-redirectUri" value="" placeholder="留空使用默认回调页面">
+        </div>
+        <button class="btn btn-primary" onclick="startAuth('tiktok')">开始TikTok授权</button>
+        <button class="btn btn-secondary" onclick="clearResults('tiktok')">清空结果</button>
+      </div>
+
+      <div id="tiktok-results" class="section hidden">
+        <h3>授权结果</h3>
+        <div id="tiktok-output"></div>
+      </div>
+    </div>
+
+    <!-- Instagram 授权 -->
+    <div id="instagram-tab" class="tab-content">
+      <div class="section">
+        <h3>Instagram 授权配置</h3>
+        <div class="input-group">
+          <label for="instagram-userId">用户ID:</label>
+          <input type="text" id="instagram-userId" readonly placeholder="自动生成的UUID">
+        </div>
+        <div class="input-group">
+          <label for="instagram-serverName">服务器名称:</label>
+          <input type="text" id="instagram-serverName" value="wondera" placeholder="输入服务器名称">
+        </div>
+        <div class="input-group">
+          <label for="instagram-redirectUri">重定向URI:</label>
+          <input type="text" id="instagram-redirectUri" value="" placeholder="留空使用默认回调页面">
+        </div>
+        <button class="btn btn-primary" onclick="startAuth('instagram')">开始Instagram授权</button>
+        <button class="btn btn-secondary" onclick="clearResults('instagram')">清空结果</button>
+      </div>
+
+      <div id="instagram-results" class="section hidden">
+        <h3>授权结果</h3>
+        <div id="instagram-output"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = window.location.origin;
+
+    // 生成UUID
+    function generateUUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        const r = Math.random() * 16 | 0;
+        const v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
+    // 切换标签页
+    function switchTab(platform) {
+      // 隐藏所有标签内容
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      // 显示选中的标签内容
+      document.getElementById(`${platform}-tab`).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // 开始授权
+    async function startAuth(platform) {
+      const userId = document.getElementById(`${platform}-userId`).value;
+      const serverName = document.getElementById(`${platform}-serverName`).value;
+      let redirectUri = document.getElementById(`${platform}-redirectUri`).value;
+
+      if (!userId || !serverName) {
+        alert('请填写用户ID和服务器名称');
+        return;
+      }
+
+      // 如果没有填写重定向URI，使用默认值
+      if (!redirectUri) {
+        redirectUri = `${window.location.origin}/static/callback.html`;
+      }
+
+      try {
+        log(platform, '开始OAuth授权流程...', 'info');
+        log(platform, `平台: ${platform}`, 'info');
+        log(platform, `用户ID: ${userId}`, 'info');
+        log(platform, `服务器: ${serverName}`, 'info');
+
+        const response = await fetch(`${API_BASE}/auth/start`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            provider: platform,
+            user_id: userId,
+            server_name: serverName,
+            redirect_uri: redirectUri
+          })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          const authUrl = result.data ? result.data.auth_url : result.auth_url;
+          if (authUrl) {
+            log(platform, `✅ 授权URL生成成功`, 'success');
+            log(platform, `授权URL: ${authUrl}`, 'info');
+            // 自动打开授权页面
+            window.open(authUrl, '_blank');
+          } else {
+            log(platform, '❌ 错误: 未获取到授权URL', 'error');
+          }
+        } else {
+          log(platform, `❌ 授权失败: ${result.error || '未知错误'}`, 'error');
+        }
+      } catch (error) {
+        log(platform, `❌ 网络错误: ${error.message}`, 'error');
+      }
+    }
+
+    // 日志函数
+    function log(platform, message, type = 'info') {
+      const output = document.getElementById(`${platform}-output`);
+      const div = document.createElement('div');
+      div.className = `result ${type}`;
+      div.innerHTML = `<span class="status-indicator ${type}"></span>${new Date().toLocaleTimeString()}: ${message}`;
+      output.appendChild(div);
+      output.scrollTop = output.scrollHeight;
+
+      // 显示结果区域
+      document.getElementById(`${platform}-results`).classList.remove('hidden');
+    }
+
+    // 清空结果
+    function clearResults(platform) {
+      document.getElementById(`${platform}-output`).innerHTML = '';
+      document.getElementById(`${platform}-results`).classList.add('hidden');
+    }
+
+    // 页面加载时的初始化
+    window.onload = function () {
+      // 为所有平台生成UUID
+      const platforms = ['youtube', 'x', 'facebook', 'tiktok', 'instagram'];
+      platforms.forEach(platform => {
+        const userId = generateUUID();
+        document.getElementById(`${platform}-userId`).value = userId;
+      });
+    };
+  </script>
+</body>
+
+</html>

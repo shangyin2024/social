@@ -1,0 +1,1049 @@
+basePath: /
+definitions:
+  types.APIResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+      request_id:
+        type: string
+      status:
+        type: string
+    type: object
+  types.BatchGetRecentPostsRequest:
+    properties:
+      end_time:
+        description: 结束时间戳（可选）
+        example: 1704153599
+        type: integer
+      platforms:
+        description: 平台列表，最多10个平台
+        items:
+          properties:
+            limit:
+              description: 获取数量限制，默认10，最大100
+              example: 10
+              maximum: 100
+              minimum: 1
+              type: integer
+            provider:
+              description: 平台名称
+              enum:
+                - youtube
+                - x
+                - facebook
+                - tiktok
+                - instagram
+              example: x
+              type: string
+          required:
+            - provider
+          type: object
+        maxItems: 10
+        minItems: 1
+        type: array
+      server_name:
+        description: 服务名称
+        example: myapp
+        maxLength: 50
+        minLength: 1
+        type: string
+      start_time:
+        description: 开始时间戳（可选）
+        example: 1704067199
+        type: integer
+      user_id:
+        description: 用户ID
+        example: user123
+        maxLength: 100
+        minLength: 1
+        type: string
+    required:
+      - platforms
+      - server_name
+      - user_id
+    type: object
+  types.BatchGetRecentPostsResponse:
+    properties:
+      error_count:
+        description: 查询失败的平台数量
+        example: 1
+        type: integer
+      platforms:
+        description: 各平台的帖子列表
+        items:
+          $ref: "#/definitions/types.PlatformPosts"
+        type: array
+      server_name:
+        example: myapp
+        type: string
+      success_count:
+        description: 成功查询的平台数量
+        example: 3
+        type: integer
+      total_posts:
+        description: 所有平台的总帖子数
+        example: 25
+        type: integer
+      user_id:
+        example: user123
+        type: string
+    type: object
+  types.CallbackRequest:
+    properties:
+      code:
+        description: 授权码
+        example: authorization_code
+        minLength: 1
+        type: string
+      provider:
+        description: 平台名称 可选值：youtube x facebook tiktok instagram
+        enum:
+          - youtube
+          - x
+          - facebook
+          - tiktok
+          - instagram
+        example: x
+        type: string
+      redirect_uri:
+        description: 重定向URI
+        example: hhttps://test-pubproject.wondera.io/static/callback.html
+        type: string
+      server_name:
+        description: 服务器名称
+        example: myapp
+        maxLength: 50
+        minLength: 1
+        type: string
+      state:
+        description: 状态参数，包含用户ID等信息
+        example: encoded_state_string
+        minLength: 1
+        type: string
+      user_id:
+        description: 服务内部用户ID 必填
+        example: user123
+        maxLength: 100
+        minLength: 1
+        type: string
+    required:
+      - code
+      - provider
+      - redirect_uri
+      - server_name
+      - state
+      - user_id
+    type: object
+  types.CallbackResponse:
+    properties:
+      expires_at:
+        description: 时间戳格式
+        example: 1704067199
+        type: integer
+      message:
+        example: OAuth callback completed successfully
+        type: string
+      provider:
+        example: x
+        type: string
+      refer_at:
+        description: 时间戳格式
+        example: 1704067199
+        type: integer
+      server_name:
+        example: myapp
+        type: string
+      user_id:
+        example: user123
+        type: string
+    type: object
+  types.ErrorResponse:
+    properties:
+      code:
+        type: string
+      error:
+        type: string
+      request_id:
+        type: string
+    type: object
+  types.GetRecentPostsRequest:
+    properties:
+      end_time:
+        description: 结束时间戳（可选）
+        example: 1704153599
+        type: integer
+      limit:
+        description: 获取数量限制，默认10，最大100
+        example: 10
+        maximum: 100
+        minimum: 1
+        type: integer
+      provider:
+        description: 平台名称
+        enum:
+          - youtube
+          - x
+          - facebook
+          - tiktok
+          - instagram
+        example: x
+        type: string
+      server_name:
+        description: 服务名称
+        example: myapp
+        maxLength: 50
+        minLength: 1
+        type: string
+      start_time:
+        description: 开始时间戳（可选）
+        example: 1704067199
+        type: integer
+      user_id:
+        description: 用户ID
+        example: user123
+        maxLength: 100
+        minLength: 1
+        type: string
+    required:
+      - provider
+      - server_name
+      - user_id
+    type: object
+  types.GetRecentPostsResponse:
+    properties:
+      posts:
+        description: 最近发布的帖子列表
+        items:
+          $ref: "#/definitions/types.Post"
+        type: array
+      provider:
+        example: x
+        type: string
+      server_name:
+        example: myapp
+        type: string
+      total:
+        description: 总数量
+        example: 10
+        type: integer
+      user_id:
+        example: user123
+        type: string
+    type: object
+  types.GetUserInfoRequest:
+    properties:
+      provider:
+        description: 平台名称
+        enum:
+          - youtube
+          - x
+          - facebook
+          - tiktok
+          - instagram
+        example: x
+        type: string
+      server_name:
+        description: 服务名称
+        example: myapp
+        maxLength: 50
+        minLength: 1
+        type: string
+      user_id:
+        description: 用户ID
+        example: user123
+        maxLength: 100
+        minLength: 1
+        type: string
+    required:
+      - provider
+      - server_name
+      - user_id
+    type: object
+  types.GetUserInfoResponse:
+    properties:
+      provider:
+        example: x
+        type: string
+      server_name:
+        example: myapp
+        type: string
+      user_id:
+        example: user123
+        type: string
+      user_info:
+        $ref: "#/definitions/types.UserInfo"
+    type: object
+  types.IsAuthorizedRequest:
+    properties:
+      provider:
+        enum:
+          - youtube
+          - x
+          - facebook
+          - tiktok
+          - instagram
+        example: x
+        type: string
+      server_name:
+        example: myapp
+        maxLength: 50
+        minLength: 1
+        type: string
+      user_id:
+        example: user123
+        maxLength: 100
+        minLength: 1
+        type: string
+    required:
+      - provider
+      - server_name
+      - user_id
+    type: object
+  types.IsAuthorizedResponse:
+    properties:
+      is_authorized:
+        example: true
+        type: boolean
+    type: object
+  types.PlatformPosts:
+    properties:
+      error:
+        description: 如果该平台查询失败，记录错误信息
+        example: authentication failed
+        type: string
+      posts:
+        description: 该平台的帖子列表
+        items:
+          $ref: "#/definitions/types.Post"
+        type: array
+      provider:
+        example: x
+        type: string
+      server_name:
+        example: myapp
+        type: string
+      total:
+        description: 该平台的总数量
+        example: 10
+        type: integer
+      user_id:
+        example: user123
+        type: string
+    type: object
+  types.Post:
+    properties:
+      content:
+        description: 帖子内容
+        example: Hello World!
+        type: string
+      created_at:
+        description: 创建时间戳
+        example: 1704067199
+        type: integer
+      description:
+        description: 描述
+        example: Post description
+        type: string
+      id:
+        description: 帖子ID
+        example: "1234567890"
+        type: string
+      media_type:
+        description: 媒体类型：image, video, audio
+        example: image
+        type: string
+      media_url:
+        description: 媒体URL
+        example: https://example.com/image.jpg
+        type: string
+      stats:
+        allOf:
+          - $ref: "#/definitions/types.StatsData"
+        description: 统计信息
+      title:
+        description: 标题（YouTube等平台）
+        example: My Post
+        type: string
+      updated_at:
+        description: 更新时间戳
+        example: 1704067199
+        type: integer
+      url:
+        description: 帖子链接
+        example: https://x.com/user/status/1234567890
+        type: string
+    type: object
+  types.RefreshTokenRequest:
+    properties:
+      provider:
+        description: 平台名称
+        enum:
+          - youtube
+          - x
+          - facebook
+          - tiktok
+          - instagram
+        example: x
+        type: string
+      server_name:
+        description: 服务名称
+        example: myapp
+        maxLength: 50
+        minLength: 1
+        type: string
+      user_id:
+        description: 用户ID
+        example: user123
+        maxLength: 100
+        minLength: 1
+        type: string
+    required:
+      - provider
+      - server_name
+      - user_id
+    type: object
+  types.RefreshTokenResponse:
+    properties:
+      expires_at:
+        description: 新token的过期时间戳
+        example: 1704067199
+        type: integer
+      message:
+        example: Token refreshed successfully
+        type: string
+      provider:
+        example: x
+        type: string
+      refreshed_at:
+        description: 刷新时间戳
+        example: 1704067199
+        type: integer
+      server_name:
+        example: myapp
+        type: string
+      user_id:
+        example: user123
+        type: string
+    type: object
+  types.ShareRequest:
+    properties:
+      content:
+        description: text content
+        example: Hello World!
+        maxLength: 280
+        type: string
+      description:
+        example: This is a description
+        maxLength: 500
+        type: string
+      media_url:
+        description: url to media (backend should download & upload)
+        example: https://example.com/image.jpg
+        type: string
+      privacy:
+        enum:
+          - public
+          - private
+          - unlisted
+          - friends
+          - followers
+        example: public
+        type: string
+      provider:
+        description: 平台名称 可选值：youtube x facebook tiktok instagram
+        enum:
+          - youtube
+          - x
+          - facebook
+          - tiktok
+          - instagram
+        example: x
+        type: string
+      server_name:
+        description: 服务名称 必填
+        example: myapp
+        maxLength: 50
+        minLength: 1
+        type: string
+      tags:
+        example:
+          - hello
+          - world
+        items:
+          type: string
+        maxItems: 10
+        type: array
+      title:
+        example: My Post
+        maxLength: 100
+        type: string
+      user_id:
+        description: 用户ID 必填 同一服务名称下user_id唯一
+        example: user123
+        maxLength: 100
+        minLength: 1
+        type: string
+    required:
+      - provider
+      - server_name
+      - user_id
+    type: object
+  types.ShareResponse:
+    properties:
+      content:
+        example: "Hello from Social Platform! \U0001F680"
+        type: string
+      media_id:
+        description: Tweet ID or post ID for status query
+        example: "1234567890"
+        type: string
+      media_url:
+        example: https://example.com/image.jpg
+        type: string
+      provider:
+        example: x
+        type: string
+      server_name:
+        example: myapp
+        type: string
+      tags:
+        example:
+          - social
+          - oauth
+          - test
+        items:
+          type: string
+        type: array
+      user_id:
+        example: user123
+        type: string
+    type: object
+  types.StartAuthRequest:
+    properties:
+      provider:
+        description: 平台名称 可选值：youtube x facebook tiktok instagram
+        enum:
+          - youtube
+          - x
+          - facebook
+          - tiktok
+          - instagram
+        example: x
+        type: string
+      redirect_uri:
+        example: https://test-pubproject.wondera.io/static/callback.html
+        type: string
+      server_name:
+        example: myapp
+        maxLength: 50
+        minLength: 1
+        type: string
+      user_id:
+        description: 用户ID 必填 同一服务名称下user_id唯一
+        example: user123
+        maxLength: 100
+        minLength: 1
+        type: string
+    required:
+      - provider
+      - redirect_uri
+      - server_name
+      - user_id
+    type: object
+  types.StartAuthResponse:
+    properties:
+      auth_url:
+        example: https://x.com/i/oauth2/authorize?response_type=code&client_id=...
+        type: string
+      provider:
+        example: x
+        type: string
+      server_name:
+        example: myapp
+        type: string
+      user_id:
+        example: user123
+        type: string
+    type: object
+  types.StatsData:
+    properties:
+      likes:
+        example: 100
+        type: integer
+      replies:
+        example: 25
+        type: integer
+      retweets:
+        example: 50
+        type: integer
+      shares:
+        example: 10
+        type: integer
+      views:
+        example: 1000
+        type: integer
+    type: object
+  types.StatsRequest:
+    properties:
+      media_id:
+        example: "1234567890"
+        maxLength: 100
+        type: string
+      provider:
+        description: 平台名称 可选值：youtube x facebook tiktok instagram
+        enum:
+          - youtube
+          - x
+          - facebook
+          - tiktok
+          - instagram
+        example: x
+        type: string
+      server_name:
+        example: myapp
+        maxLength: 50
+        minLength: 1
+        type: string
+      user_id:
+        description: 用户ID 必填 同一服务名称下user_id唯一
+        example: user123
+        maxLength: 100
+        minLength: 1
+        type: string
+    required:
+      - provider
+      - server_name
+      - user_id
+    type: object
+  types.StatsResponse:
+    properties:
+      media_id:
+        example: "1234567890"
+        type: string
+      provider:
+        example: x
+        type: string
+      server_name:
+        example: myapp
+        type: string
+      stats:
+        $ref: "#/definitions/types.StatsData"
+      user_id:
+        example: user123
+        type: string
+    type: object
+  types.UserInfo:
+    properties:
+      avatar_url:
+        description: 头像URL
+        example: https://example.com/avatar.jpg
+        type: string
+      display_name:
+        description: 显示名称
+        example: John Doe
+        type: string
+      email:
+        description: 邮箱（如果可用）
+        example: john@example.com
+        type: string
+      followers:
+        description: 粉丝数
+        example: 1000
+        type: integer
+      following:
+        description: 关注数
+        example: 500
+        type: integer
+      id:
+        description: 平台用户ID
+        example: "1234567890"
+        type: string
+      profile_url:
+        description: 个人资料URL
+        example: https://x.com/johndoe
+        type: string
+      username:
+        description: 用户名
+        example: johndoe
+        type: string
+      verified:
+        description: 是否认证用户
+        example: false
+        type: boolean
+    type: object
+host: localhost:8084
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: 多平台社交媒体授权分享API
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Social Media Platform API
+  version: "1.0"
+paths:
+  /api/batch-recent-posts:
+    post:
+      consumes:
+        - application/json
+      description: 批量获取多个平台最近发布的内容列表，支持定时后驱
+      parameters:
+        - description: 批量获取最近发布内容请求参数
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/types.BatchGetRecentPostsRequest"
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+              - $ref: "#/definitions/types.APIResponse"
+              - properties:
+                  data:
+                    $ref: "#/definitions/types.BatchGetRecentPostsResponse"
+                type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+        "401":
+          description: 未授权
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+      summary: 批量获取最近发布的内容
+      tags:
+        - 内容
+  /api/recent-posts:
+    post:
+      consumes:
+        - application/json
+      description: 获取指定平台最近发布的内容列表
+      parameters:
+        - description: 获取最近发布内容请求参数
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/types.GetRecentPostsRequest"
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+              - $ref: "#/definitions/types.APIResponse"
+              - properties:
+                  data:
+                    $ref: "#/definitions/types.GetRecentPostsResponse"
+                type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+        "401":
+          description: 未授权
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+      summary: 获取最近发布的内容
+      tags:
+        - 内容
+  /api/share:
+    post:
+      consumes:
+        - application/json
+      description: 将内容分享到指定的社交媒体平台
+      parameters:
+        - description: 分享请求参数
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/types.ShareRequest"
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: 分享成功
+          schema:
+            allOf:
+              - $ref: "#/definitions/types.APIResponse"
+              - properties:
+                  data:
+                    $ref: "#/definitions/types.ShareResponse"
+                type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+        "401":
+          description: 未授权
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+      summary: 分享内容到社交媒体平台
+      tags:
+        - 分享
+  /api/stats:
+    post:
+      consumes:
+        - application/json
+      description: 获取指定媒体内容在社交媒体平台上的统计信息
+      parameters:
+        - description: 统计请求参数
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/types.StatsRequest"
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: 统计信息
+          schema:
+            allOf:
+              - $ref: "#/definitions/types.APIResponse"
+              - properties:
+                  data:
+                    $ref: "#/definitions/types.StatsResponse"
+                type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+        "401":
+          description: 未授权
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+      summary: 获取社交媒体内容统计信息
+      tags:
+        - 统计
+  /auth/callback:
+    post:
+      consumes:
+        - application/json
+      description: 前端收到第三方平台OAuth回调后，调用此接口处理授权码交换和token保存
+      parameters:
+        - description: 回调请求参数
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/types.CallbackRequest"
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OAuth callback completed
+          schema:
+            allOf:
+              - $ref: "#/definitions/types.APIResponse"
+              - properties:
+                  data:
+                    $ref: "#/definitions/types.CallbackResponse"
+                type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+      summary: 处理OAuth回调
+      tags:
+        - 认证
+  /auth/is-authorized:
+    post:
+      consumes:
+        - application/json
+      description: 查询指定用户是否授权指定平台
+      parameters:
+        - description: 查询是否授权请求参数
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/types.IsAuthorizedRequest"
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: 查询成功
+          schema:
+            allOf:
+              - $ref: "#/definitions/types.APIResponse"
+              - properties:
+                  data:
+                    $ref: "#/definitions/types.IsAuthorizedResponse"
+                type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+      summary: 查询是否授权
+      tags:
+        - 认证
+  /auth/refresh-token:
+    post:
+      consumes:
+        - application/json
+      description: 客户端主动刷新指定平台的访问token
+      parameters:
+        - description: 刷新token请求参数
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/types.RefreshTokenRequest"
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: token刷新成功
+          schema:
+            allOf:
+              - $ref: "#/definitions/types.APIResponse"
+              - properties:
+                  data:
+                    $ref: "#/definitions/types.RefreshTokenResponse"
+                type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+        "401":
+          description: token不存在或刷新失败
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+      summary: 手动刷新token
+      tags:
+        - 认证
+  /auth/start:
+    post:
+      consumes:
+        - application/json
+      description: 启动指定平台的OAuth授权流程，返回授权URL
+      parameters:
+        - description: 授权请求参数
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/types.StartAuthRequest"
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: 授权URL生成成功
+          schema:
+            allOf:
+              - $ref: "#/definitions/types.APIResponse"
+              - properties:
+                  data:
+                    $ref: "#/definitions/types.StartAuthResponse"
+                type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+      summary: 开始OAuth授权流程
+      tags:
+        - 认证
+  /auth/user-info:
+    post:
+      consumes:
+        - application/json
+      description: 获取指定平台用户的详细信息
+      parameters:
+        - description: 获取用户信息请求参数
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/types.GetUserInfoRequest"
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: 获取用户信息成功
+          schema:
+            allOf:
+              - $ref: "#/definitions/types.APIResponse"
+              - properties:
+                  data:
+                    $ref: "#/definitions/types.GetUserInfoResponse"
+                type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+        "401":
+          description: 未授权或token过期
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+      summary: 获取用户信息
+      tags:
+        - 认证
+  /health:
+    get:
+      description: 检查服务健康状态，包括存储连接状态
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: 健康状态
+          schema:
+            additionalProperties: true
+            type: object
+        "503":
+          description: 服务不可用
+          schema:
+            $ref: "#/definitions/types.ErrorResponse"
+      summary: 健康检查
+      tags:
+        - 系统
+schemes:
+  - http
+  - https
+swagger: "2.0"
